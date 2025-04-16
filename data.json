@@ -1,0 +1,26 @@
+{
+    "data": {
+        "dyn_list": [
+            {
+                "name": "Vendor1",
+                "items": [ "Item1", "Item2", "Item3", "Item4" ]
+            },
+            {
+                "name": "Vendor2",
+                "items": [ "Item5", "Item6", "Item7", "Item8", "Item9", "Item10" ]
+            }
+
+        ],
+        "orders": [
+            {
+                "vendor_name": "VName",
+                "item_name": "IName",
+                "time": "Time",
+                "status": "pending"
+            }
+        ],
+        "cmds": {
+            "test_cmd": "cmd"
+        }
+    }
+}
