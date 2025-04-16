@@ -19,8 +19,10 @@
                 "status": "pending"
             }
         ],
-        "cmds": {
-            "test_cmd": "cmd"
-        }
+        "cmds": [
+            {
+                "test_cmd": "cmd"
+            }
+        ]
     }
 }
