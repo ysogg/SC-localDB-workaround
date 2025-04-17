@@ -13,5 +13,6 @@ with open('data.json') as data:
 
 req = requests.put(url, data=data_str, headers=headers)
 
-print(req)
-print(req.json())
+#Debug prints
+#print(req)
+#print(req.json())

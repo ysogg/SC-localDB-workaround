@@ -53,19 +53,18 @@ def updateJson():
     #get updated list of orders
     orders_list = fetchOrders()
 
-    f = open("data2.json", "w")
+    f = open("data.json", "w")
     args = (dyn_list, orders_list)
     f.write("""
 {{
+    "data": {{
     "dyn_list": [
 {0}"orders": [
         {1}
     ],
     "cmds": [
-        {{
-                
-        }}
     ]
+    }}
 }}
     """.format(*args))
     f.close()
@@ -101,6 +100,7 @@ url = os.getenv("CONN_URL")
 headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
 req = requests.get(url, headers=headers)
 
+#Debug prints
 #print(req)
 #print(req.json())
 obj = req.json()
@@ -109,7 +109,7 @@ obj = req.json()
 
 numCmds = len(obj['data']['cmds'])
 if (numCmds > 0):
-    print("got {0} cmd(s)".format(numCmds))
+    #print("got {0} cmd(s)".format(numCmds))
     conn = pymssql.connect(server=SERVER, user=USER, password=PASS, database=DB, as_dict=True)
 
     for cmd in obj['data']['cmds']:
