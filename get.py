@@ -57,61 +57,69 @@ def updateJson():
     args = (dyn_list, orders_list)
     f.write("""
 {{
-    "data": {{
-        "dyn_list": [
+    "dyn_list": [
 {0}"orders": [
-            {1}
-        ],
-        "cmds": [
-            {{
+        {1}
+    ],
+    "cmds": [
+        {{
                 
-            }}
-        ]
-    }}
+        }}
+    ]
 }}
     """.format(*args))
     f.close()
 
+def dbAdd(cmd):
+    ADD_QUERY = "INSERT INTO Order_Table (order_id, order_type, order_time, order_status, vendor) VALUES (%s, %s, %s, %s, %s)"
+    vals = (cmd['order_id'], cmd['order_type'], datetime.datetime.now(), cmd['order_status'], cmd['vendor'])
+    
+    cursor = conn.cursor()
+    cursor.execute(ADD_QUERY, vals)
+    conn.commit()
+    cursor.close()
+
+def dbRemove(cmd):
+    DEL_QUERY = "DELETE FROM Order_Table WHERE order_id=%s"
+    vals = (cmd['order_id'])
+
+    cursor = conn.cursor()
+    cursor.execute(DEL_QUERY, vals)
+    conn.commit()
+    cursor.close()
+
+def dbUpdate(cmd):
+    UPDATE_QUERY = "UPDATE Order_Table set order_status=%s WHERE order_id=%s"
+    vals = (cmd['order_status'], cmd['order_id'])
+
+    cursor = conn.cursor()
+    cursor.execute(UPDATE_QUERY, vals)
+    conn.commit()
+    cursor.close()
 
 url = os.getenv("CONN_URL")
 headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
 req = requests.get(url, headers=headers)
 
-print(req)
-print(req.json())
-
+#print(req)
+#print(req.json())
 obj = req.json()
-print("\n")
-print(obj['data']['cmds'])
+#print("\n")
+#print("(1)", obj['data']['cmds'])
 
 numCmds = len(obj['data']['cmds'])
-#Debug
 if (numCmds > 0):
     print("got {0} cmd(s)".format(numCmds))
-
     conn = pymssql.connect(server=SERVER, user=USER, password=PASS, database=DB, as_dict=True)
 
-    cursor = conn.cursor()
-    
-    #test vals
-    order_id = 112
-    order_type = "py_test"
-    vendor = "py_vendor_test"
+    for cmd in obj['data']['cmds']:
+        if (cmd['cmd_type'] == "ADD"):
+            dbAdd(cmd)
+        elif (cmd['cmd_type'] == "DEL"):
+            dbRemove(cmd)
+        elif (cmd['cmd_type'] == "UPDATE"):
+            dbUpdate(cmd)
 
-    ADD_QUERY = "INSERT INTO Order_Table (order_id, order_type, order_time, order_status, vendor) VALUES (%s, %s, %s, %s, %s)"
-    vals = (order_id, order_type, datetime.datetime.now(), "pending", vendor) #fix datetime mismatch w/ db
-
-    cursor.execute(ADD_QUERY, vals)
-    
-
-    cursor.execute(SQL_QUERY)
-    entries = cursor.fetchall()
-    for ent in entries:
-        print(ent)
-
-    conn.commit() #persist data
-
-    cursor.close()
     conn.close()
 
 updateJson()
